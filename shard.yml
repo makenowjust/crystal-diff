@@ -4,4 +4,7 @@ version: 1.0.0
 authors:
   - TSUYUSATO Kitsune <make.just.on@gmail.com>
 
+description: |
+  Crystal sequence differencing implementation.
+
 license: MIT

@@ -1,6 +1,6 @@
 # crystal-diff
 
-Crystal text differencing implementation.
+Crystal sequence differencing implementation.
 
 Based on the algorithm proposed in ["An O(NP) Sequence Comparision Algorithm" (Wu, 1989)](https://publications.mpi-cbg.de/Wu_1990_6334.pdf)
 
