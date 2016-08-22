@@ -1,7 +1,12 @@
-class Diff
+class Diff(A, B)
   VERSION = "1.0.0"
 
-  record Chunk, diff, type, range_a, range_b do
+  struct Chunk(T)
+    def initialize(@diff : T, @type : Type, @range_a : Range(Int32, Int32), @range_b : Range(Int32, Int32))
+    end
+
+    property diff, type, range_a, range_b
+
     def append?; type == Type::APPEND end
     def delete?; type == Type::DELETE end
     def no_change?; type == Type::NO_CHANGE end
@@ -17,7 +22,7 @@ class Diff
       end
     end
 
-    def ==(other : self)
+    def ==(other : Chunk)
       type == other.type &&
       range_a == other.range_a &&
       range_b == other.range_b
@@ -45,7 +50,12 @@ class Diff
     Diff.new(a, b).run
   end
 
-  def initialize(@a, @b)
+  @m : Int32
+  @n : Int32
+  @reverse : Bool
+  @edit_distance : Int32?
+
+  def initialize(@a : A, @b : B)
     @m = a.size
     @n = b.size
     if @reverse = @n < @m
@@ -101,7 +111,7 @@ class Diff
     edit_distance
 
     x, y = @m, @n
-    chunk_list = [] of Chunk
+    chunk_list = [] of Chunk(self)
     loop do
       i = @table[{x, y}]
       if i != 0
