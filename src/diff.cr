@@ -13,11 +13,9 @@ class Diff(A, B)
 
     def data
       case type
-      when Type::NO_CHANGE
-        diff.a[range_a]
       when Type::APPEND
         diff.b[range_b]
-      when Type::DELETE
+      else
         diff.a[range_a]
       end
     end
