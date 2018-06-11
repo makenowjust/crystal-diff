@@ -83,7 +83,8 @@ class Diff(A, B)
     delta = @n - @m
     fp = Array.new @m + @n + 3, -1
 
-    loop do |p|
+    p = 0
+    loop do
       (-p       ..delta - 1).each         {|k| fp[k + offset] = snake k, [fp[k - 1 + offset] + 1, fp[k + 1 + offset]].max }
       (delta + 1..delta + p).reverse_each {|k| fp[k + offset] = snake k, [fp[k - 1 + offset] + 1, fp[k + 1 + offset]].max }
       fp[delta + offset] = snake delta, [fp[delta - 1 + offset] + 1, fp[delta + 1 + offset]].max
@@ -91,6 +92,7 @@ class Diff(A, B)
       if fp[delta + offset] == @n
         return @edit_distance = delta + p * 2
       end
+      p += 1
     end
   end
 
