@@ -7,9 +7,17 @@ class Diff(A, B)
 
     property diff, type, range_a, range_b
 
-    def append?; type == Type::APPEND end
-    def delete?; type == Type::DELETE end
-    def no_change?; type == Type::NO_CHANGE end
+    def append?
+      type == Type::APPEND
+    end
+
+    def delete?
+      type == Type::DELETE
+    end
+
+    def no_change?
+      type == Type::NO_CHANGE
+    end
 
     def data
       case type
@@ -24,8 +32,8 @@ class Diff(A, B)
 
     def ==(other : Chunk)
       type == other.type &&
-      range_a == other.range_a &&
-      range_b == other.range_b
+        range_a == other.range_a &&
+        range_b == other.range_b
     end
   end
 
@@ -85,8 +93,8 @@ class Diff(A, B)
 
     p = 0
     loop do
-      (-p       ..delta - 1).each         {|k| fp[k + offset] = snake k, [fp[k - 1 + offset] + 1, fp[k + 1 + offset]].max }
-      (delta + 1..delta + p).reverse_each {|k| fp[k + offset] = snake k, [fp[k - 1 + offset] + 1, fp[k + 1 + offset]].max }
+      (-p..delta - 1).each { |k| fp[k + offset] = snake k, [fp[k - 1 + offset] + 1, fp[k + 1 + offset]].max }
+      (delta + 1..delta + p).reverse_each { |k| fp[k + offset] = snake k, [fp[k - 1 + offset] + 1, fp[k + 1 + offset]].max }
       fp[delta + offset] = snake delta, [fp[delta - 1 + offset] + 1, fp[delta + 1 + offset]].max
 
       if fp[delta + offset] == @n
