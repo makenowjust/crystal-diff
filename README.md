@@ -5,7 +5,6 @@ Crystal sequence differencing implementation.
 Based on the algorithm proposed in ["An O(NP) Sequence Comparision Algorithm" (Wu, 1989)](https://publications.mpi-cbg.de/Wu_1990_6334.pdf)
 
 [![Build Status](https://img.shields.io/travis/MakeNowJust/crystal-diff.svg?style=flat-square)](https://travis-ci.org/MakeNowJust/crystal-diff)
-[![Document](https://img.shields.io/badge/docrystal-ref-866BA6.svg?style=flat-square)](http://docrystal.org/github.com/MakeNowJust/crystal-diff)
 
 ## Installation
 
