@@ -98,15 +98,9 @@ class Diff(A, B)
 
     p = 0
     loop do
-<<<<<<< HEAD
-      (-p..delta - 1).each { |k| fp[k + offset] = snake k, [fp[k - 1 + offset] + 1, fp[k + 1 + offset]].max }
-      (delta + 1..delta + p).reverse_each { |k| fp[k + offset] = snake k, [fp[k - 1 + offset] + 1, fp[k + 1 + offset]].max }
-      fp[delta + offset] = snake delta, [fp[delta - 1 + offset] + 1, fp[delta + 1 + offset]].max
-=======
       (-p..delta - 1).each { |k| fp[k + offset] = snake k, fp[k - 1 + offset] + 1, fp[k + 1 + offset], offset }
       (delta + 1..delta + p).reverse_each { |k| fp[k + offset] = snake k, fp[k - 1 + offset] + 1, fp[k + 1 + offset], offset }
       fp[delta + offset] = snake delta, fp[delta - 1 + offset] + 1, fp[delta + 1 + offset], offset
->>>>>>> Optimize edit script construction
 
       return @edit_distance = delta + p * 2 if fp[delta + offset] == @n
       p += 1
