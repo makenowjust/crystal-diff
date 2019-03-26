@@ -114,7 +114,7 @@ class Diff(A, B)
   end
 
   private def snake(k, p, pp, offset)
-    r = p > pp ? @path[k-1+offset] : @path[k+1+offset]
+    r = p > pp ? @path[k - 1 + offset] : @path[k + 1 + offset]
 
     y = {p, pp}.max
     x = y - k
@@ -143,7 +143,6 @@ class Diff(A, B)
       ps << {p[0], p[1]}
       r = p[2]
     end
-
 
     chunk_list = [] of Chunk(self)
 
