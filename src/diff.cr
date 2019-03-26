@@ -1,5 +1,5 @@
 class Diff(A, B)
-  VERSION = "1.0.0"
+  VERSION = "1.1.0"
 
   struct Chunk(T)
     def initialize(@diff : T, @type : Type, @range_a : Range(Int32, Int32), @range_b : Range(Int32, Int32))
