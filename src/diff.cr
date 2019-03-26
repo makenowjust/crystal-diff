@@ -35,6 +35,10 @@ class Diff(A, B)
         range_a == other.range_a &&
         range_b == other.range_b
     end
+
+    def inspect(io)
+      io << "Chunk(@type=#{@type}, @range_a=#{@range_a}, @range_b=#{@range_b})"
+    end
   end
 
   enum Type
@@ -71,7 +75,8 @@ class Diff(A, B)
       @m, @n = @n, @m
     end
 
-    @table = {} of {Int32, Int32} => Int32
+    @path = Array(Int32).new @m + @n + 3, -1
+    @points = [] of {Int32, Int32, Int32}
   end
 
   def a
@@ -93,76 +98,97 @@ class Diff(A, B)
 
     p = 0
     loop do
+<<<<<<< HEAD
       (-p..delta - 1).each { |k| fp[k + offset] = snake k, [fp[k - 1 + offset] + 1, fp[k + 1 + offset]].max }
       (delta + 1..delta + p).reverse_each { |k| fp[k + offset] = snake k, [fp[k - 1 + offset] + 1, fp[k + 1 + offset]].max }
       fp[delta + offset] = snake delta, [fp[delta - 1 + offset] + 1, fp[delta + 1 + offset]].max
+=======
+      (-p..delta - 1).each { |k| fp[k + offset] = snake k, fp[k - 1 + offset] + 1, fp[k + 1 + offset], offset }
+      (delta + 1..delta + p).reverse_each { |k| fp[k + offset] = snake k, fp[k - 1 + offset] + 1, fp[k + 1 + offset], offset }
+      fp[delta + offset] = snake delta, fp[delta - 1 + offset] + 1, fp[delta + 1 + offset], offset
+>>>>>>> Optimize edit script construction
 
-      if fp[delta + offset] == @n
-        return @edit_distance = delta + p * 2
-      end
+      return @edit_distance = delta + p * 2 if fp[delta + offset] == @n
       p += 1
     end
   end
 
-  private def snake(k, y)
+  private def snake(k, p, pp, offset)
+    r = p > pp ? @path[k-1+offset] : @path[k+1+offset]
+
+    y = {p, pp}.max
     x = y - k
 
-    i = 0
     while x < @m && y < @n && @a[x] == @b[y]
       x += 1
       y += 1
-      i += 1
     end
-    @table[{x, y}] = i
+
+    @path[k + offset] = @points.size
+    @points << {x, y, r}
+
     y
   end
 
   def run
     edit_distance
 
-    x, y = @m, @n
-    chunk_list = [] of Chunk(self)
-    loop do
-      i = @table[{x, y}]
-      if i != 0
-        chunk_list.push chunk Type::NO_CHANGE, x - i...x, y - i...y
-      end
-      x, y = x - i, y - i
+    offset = @m + 1
+    delta = @n - @m
 
-      i = 0
-      flag = false
-      while @table[{x, y - 1}]?
-        y -= 1
-        i += 1
-      end
-      if i != 0
-        chunk_list.push chunk Type::APPEND, x...x, y...y + i
-        flag = true
-      end
-
-      i = 0
-      while @table[{x - 1, y}]?
-        x -= 1
-        i += 1
-      end
-      if i != 0
-        chunk_list.push chunk Type::DELETE, x...x + i, y...y
-        if flag && @reverse
-          chunk_list[-1], chunk_list[-2] = chunk_list[-2], chunk_list[-1]
-        end
-      end
-
-      if x == 0 && y == 0
-        return chunk_list.reverse!
-      end
+    ps = [] of {Int32, Int32}
+    r = @path[delta + offset]
+    until r == -1
+      p = @points[r]
+      ps << {p[0], p[1]}
+      r = p[2]
     end
+
+
+    chunk_list = [] of Chunk(self)
+
+    x = y = x0 = y0 = 0
+    ps.reverse_each do |p|
+      px, py = p
+
+      while x < px && py - px < y - x
+        x += 1
+      end
+      deleted = x0 != x
+      chunk chunk_list, Type::DELETE, x0...x, y0...y if deleted
+      x0 = x
+
+      while y < py && py - px > y - x
+        y += 1
+      end
+      appended = y0 != y
+      chunk chunk_list, Type::APPEND, x0...x, y0...y if appended
+      y0 = y
+
+      while x < px && y < py && py - px == y - x
+        x += 1
+        y += 1
+      end
+      chunk chunk_list, Type::NO_CHANGE, x0...x, y0...y unless x0 == x
+      x0 = x
+      y0 = y
+    end
+
+    chunk_list
   end
 
-  private def chunk(type, range_a, range_b)
+  private def chunk(chunk_list, type, range_a, range_b)
     if @reverse
-      Chunk.new self, type.reverse, range_b, range_a
+      chunk = Chunk.new self, type.reverse, range_b, range_a
     else
-      Chunk.new self, type, range_a, range_b
+      chunk = Chunk.new self, type, range_a, range_b
+    end
+
+    last = chunk_list.last?
+    if last && chunk.type == last.type
+      chunk_list[-1] = Chunk.new self, type, last.range_a.begin...chunk.range_a.end, last.range_b.begin...chunk.range_b.end
+    else
+      chunk_list << chunk
     end
   end
 end
