@@ -8,3 +8,5 @@ description: |
   Crystal sequence differencing implementation.
 
 license: MIT
+
+crystal: "*"
